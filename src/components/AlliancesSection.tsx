@@ -5,15 +5,15 @@ import { Link } from "react-router-dom";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 
 // Import optimized logos
-import microsoftLogo from "@/assets/logos/microsoft-logo.webp";
-import googleLogo from "@/assets/logos/google-logo.webp";
-import amazonLogo from "@/assets/logos/amazon-logo.webp";
-import salesforceLogo from "@/assets/logos/salesforce-logo.webp";
-import uipathLogo from "@/assets/logos/uipath-logo.webp";
-import rocketbotLogo from "@/assets/logos/rocketbot-logo.webp";
-import outsystemsLogo from "@/assets/logos/outsystems-logo.webp";
-import genexusLogo from "@/assets/logos/genexus-logo.webp";
-import koreaiLogo from "@/assets/logos/koreai-logo.webp";
+import microsoftLogo from "@/assets/logos/microsoft-carrusel.webp";
+import googleLogo from "@/assets/logos/google-carrusel.webp";
+import amazonLogo from "@/assets/logos/amazon-carrusel.webp";
+import salesforceLogo from "@/assets/logos/salesforce-carrusel.webp";
+import uipathLogo from "@/assets/logos/uipath-carrusel.webp";
+import rocketbotLogo from "@/assets/logos/rocketbot-carrusel.webp";
+import outsystemsLogo from "@/assets/logos/outsystems-carrusel.webp";
+import genexusLogo from "@/assets/logos/genexus-carrusel.webp";
+import koreaiLogo from "@/assets/logos/koreai-carrusel.webp";
 import platziLogo from "@/assets/logos/platzi-logo.webp";
 
 export const AlliancesSection = () => {
@@ -21,7 +21,7 @@ export const AlliancesSection = () => {
     { 
       name: "Microsoft", 
       color: "from-blue-600 to-blue-800",
-      logo: "/lovable-uploads/1b177d8d-a769-49b0-b875-3ac51815f856.png",
+      logo: microsoftLogo,
       route: "/alianzas/microsoft"
     },
     { 
@@ -45,7 +45,7 @@ export const AlliancesSection = () => {
     { 
       name: "UiPath", 
       color: "from-indigo-600 to-blue-700",
-      logo: "/lovable-uploads/00948265-d10e-4da2-b99d-021709cd2942.png",
+      logo: uipathlogo",
       route: "/alianzas/uipath"
     },
     { 
