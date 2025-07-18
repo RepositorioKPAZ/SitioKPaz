@@ -45,7 +45,7 @@ export const AlliancesSection = () => {
     { 
       name: "UiPath", 
       color: "from-indigo-600 to-blue-700",
-      logo: uipathlogo",
+      logo: uipathLogo,
       route: "/alianzas/uipath"
     },
     { 
