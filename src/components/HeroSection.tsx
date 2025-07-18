@@ -67,7 +67,7 @@ export const HeroSection = ({
               <OptimizedImage
                 src={heroImage} 
                 alt="Equipo trabajando en transformación digital" 
-                className="w-full h-full"
+                          className="h-full w-full"
                 objectFit="cover"
                 priority={true}
                 placeholder="blur"
