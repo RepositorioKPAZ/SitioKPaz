@@ -7,11 +7,14 @@ import { BenefitsCard } from "@/components/savings/BenefitsCard";
 import { SavingsActions } from "@/components/savings/SavingsActions";
 
 interface SavingsResultsProps {
-  teamMembers: TeamMember[];
+  teamMembers: any[]; // Nuevo: perfiles seleccionados
   totalInternalCost: number;
   totalSavings: number;
   totalOutsourcingCost: number;
   savingsPercentage: number;
+  projectDuration: number[]; // Nuevo: duración real
+  hiringDelay: number; // Nuevo: demora real
+  perfilesData?: any[];
 }
 
 export const SavingsResults = React.memo(({
@@ -19,7 +22,10 @@ export const SavingsResults = React.memo(({
   totalInternalCost,
   totalSavings,
   totalOutsourcingCost,
-  savingsPercentage
+  savingsPercentage,
+  projectDuration,
+  hiringDelay,
+  perfilesData = []
 }: SavingsResultsProps) => {
   return (
     <div className="space-y-8">
@@ -39,6 +45,10 @@ export const SavingsResults = React.memo(({
         totalInternalCost={totalInternalCost}
         totalOutsourcingCost={totalOutsourcingCost}
         savingsPercentage={savingsPercentage}
+        teamMembers={teamMembers}
+        projectDuration={projectDuration}
+        hiringDelay={hiringDelay}
+        perfilesData={perfilesData}
       />
     </div>
   );

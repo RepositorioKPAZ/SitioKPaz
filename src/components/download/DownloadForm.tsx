@@ -15,6 +15,10 @@ interface DownloadFormProps {
   totalInternalCost: number;
   totalOutsourcingCost: number;
   savingsPercentage: number;
+  teamMembers: any[]; // Nuevo: perfiles seleccionados
+  projectDuration: number[]; // Nuevo: duración real
+  hiringDelay: number; // Nuevo: demora real
+  perfilesData?: any[];
   onClose: () => void;
 }
 
@@ -23,6 +27,10 @@ export const DownloadForm = ({
   totalInternalCost,
   totalOutsourcingCost,
   savingsPercentage,
+  teamMembers,
+  projectDuration,
+  hiringDelay,
+  perfilesData = [],
   onClose
 }: DownloadFormProps) => {
   const formSchema = createSecureDownloadSchema();
@@ -87,7 +95,10 @@ export const DownloadForm = ({
     totalSavings,
     totalInternalCost,
     totalOutsourcingCost,
-    savingsPercentage
+    savingsPercentage,
+    projectDuration, // Usar valor real
+    hiringDelay,     // Usar valor real
+    teamMembers // Usar los perfiles seleccionados reales
   };
 
   return (
@@ -95,6 +106,7 @@ export const DownloadForm = ({
       <FormSubmissionHandler
         onSubmit={handleFormSubmit}
         calculationData={calculationData}
+        perfilesData={perfilesData}
       >
         {({ isSubmitting, handleSubmit }) => (
           <Form {...form}>

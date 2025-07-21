@@ -8,13 +8,21 @@ interface SavingsActionsProps {
   totalInternalCost: number;
   totalOutsourcingCost: number;
   savingsPercentage: number;
+  teamMembers: any[]; // Nuevo: perfiles seleccionados
+  projectDuration: number[]; // Nuevo: duración real
+  hiringDelay: number; // Nuevo: demora real
+  perfilesData?: any[];
 }
 
 export const SavingsActions = React.memo(({
   totalSavings,
   totalInternalCost,
   totalOutsourcingCost,
-  savingsPercentage
+  savingsPercentage,
+  teamMembers,
+  projectDuration,
+  hiringDelay,
+  perfilesData = []
 }: SavingsActionsProps) => {
   const scrollToContact = useCallback(() => {
     const element = document.getElementById('contacto');
@@ -36,6 +44,10 @@ export const SavingsActions = React.memo(({
         totalInternalCost={totalInternalCost}
         totalOutsourcingCost={totalOutsourcingCost}
         savingsPercentage={savingsPercentage}
+        teamMembers={teamMembers}
+        projectDuration={projectDuration}
+        hiringDelay={hiringDelay}
+        perfilesData={perfilesData}
       />
     </div>
   );

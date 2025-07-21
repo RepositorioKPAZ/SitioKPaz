@@ -7,12 +7,17 @@ export { type TeamMember } from "./useTeamManagement";
 
 export const useSavingsCalculator = () => {
   const [projectDuration, setProjectDuration] = useState([12]);
+  const [hiringDelay, setHiringDelay] = useState(3); // Meses de demora en contratación interna
   
   const {
     teamMembers,
     addTeamMember,
     removeTeamMember,
-    updateTeamMember
+    updateTeamMember,
+    availableRoles,
+    availableSeniorities,
+    loading: teamLoading,
+    error
   } = useTeamManagement();
 
   const {
@@ -20,12 +25,16 @@ export const useSavingsCalculator = () => {
     totalSavings,
     totalOutsourcingCost,
     savingsPercentage,
-    getTeamSummary
-  } = useSavingsCalculations(teamMembers, projectDuration);
+    getTeamSummary,
+    loading: calculationsLoading,
+    perfilesData // Exponer los datos de perfiles
+  } = useSavingsCalculations(teamMembers, projectDuration, hiringDelay);
 
   return {
     projectDuration,
     setProjectDuration,
+    hiringDelay,
+    setHiringDelay,
     teamMembers,
     addTeamMember,
     removeTeamMember,
@@ -34,6 +43,11 @@ export const useSavingsCalculator = () => {
     totalSavings,
     totalOutsourcingCost,
     savingsPercentage,
-    getTeamSummary
+    getTeamSummary,
+    availableRoles,
+    availableSeniorities,
+    loading: teamLoading || calculationsLoading,
+    error,
+    perfilesData // Exponer los datos de perfiles
   };
 };

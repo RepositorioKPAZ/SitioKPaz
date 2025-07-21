@@ -15,6 +15,7 @@ const Insights = lazyImport(() => import("@/pages/Insights"));
 const Careers = lazyImport(() => import("@/pages/Careers"));
 const NuestraEsencia = lazyImport(() => import("@/pages/NuestraEsencia"));
 const NotFound = lazyImport(() => import("@/pages/NotFound"));
+const Diagnostic = lazyImport(() => import("@/pages/Diagnostic"));
 
 // Service pages - grouped for potential route-based code splitting
 const servicePages = {
@@ -67,6 +68,7 @@ export const AppRouter = memo(() => {
         <Route path="/insights" element={<LazyRoute Component={Insights} />} />
         <Route path="/careers" element={<LazyRoute Component={Careers} />} />
         <Route path="/nuestra-esencia" element={<LazyRoute Component={NuestraEsencia} />} />
+        <Route path="/diagnostic" element={<LazyRoute Component={Diagnostic} />} />
         
         {/* Service routes */}
         <Route path="/servicios/software-development" element={<LazyRoute Component={servicePages.SoftwareDevelopment} />} />

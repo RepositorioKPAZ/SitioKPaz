@@ -17,13 +17,21 @@ interface DownloadCalculationFormProps {
   totalInternalCost: number;
   totalOutsourcingCost: number;
   savingsPercentage: number;
+  teamMembers: any[]; // Nuevo: perfiles seleccionados
+  projectDuration: number[]; // Nuevo: duración real
+  hiringDelay: number; // Nuevo: demora real
+  perfilesData?: any[];
 }
 
 export const DownloadCalculationForm = ({
   totalSavings,
   totalInternalCost,
   totalOutsourcingCost,
-  savingsPercentage
+  savingsPercentage,
+  teamMembers,
+  projectDuration,
+  hiringDelay,
+  perfilesData = []
 }: DownloadCalculationFormProps) => {
   const [open, setOpen] = useState(false);
 
@@ -56,6 +64,10 @@ export const DownloadCalculationForm = ({
           totalInternalCost={totalInternalCost}
           totalOutsourcingCost={totalOutsourcingCost}
           savingsPercentage={savingsPercentage}
+          teamMembers={teamMembers}
+          projectDuration={projectDuration}
+          hiringDelay={hiringDelay}
+          perfilesData={perfilesData}
           onClose={() => setOpen(false)}
         />
       </DialogContent>

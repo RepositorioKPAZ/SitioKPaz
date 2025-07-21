@@ -7,28 +7,89 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Calculator, TrendingUp, Users, Plus, X, Clock } from "lucide-react";
 import { TeamMember } from "@/hooks/useSavingsCalculator";
-import { roles, seniorities } from "@/data/calculatorData";
 import { useState } from "react";
 
 interface TeamConfigurationProps {
   projectDuration: number[];
   setProjectDuration: (value: number[]) => void;
+  hiringDelay: number;
+  setHiringDelay: (value: number) => void;
   teamMembers: TeamMember[];
   addTeamMember: () => void;
   removeTeamMember: (id: string) => void;
   updateTeamMember: (id: string, field: keyof TeamMember, value: string | number) => void;
+  availableRoles?: string[];
+  availableSeniorities?: string[];
+  loading?: boolean;
+  error?: string | null;
 }
 
 export const TeamConfiguration = ({
   projectDuration,
   setProjectDuration,
+  hiringDelay,
+  setHiringDelay,
   teamMembers,
   addTeamMember,
   removeTeamMember,
-  updateTeamMember
+  updateTeamMember,
+  availableRoles = [],
+  availableSeniorities = [],
+  loading = false,
+  error = null
 }: TeamConfigurationProps) => {
-  const [hasHiringDelay, setHasHiringDelay] = useState(false);
-  const [hiringDelayMonths, setHiringDelayMonths] = useState("1");
+  const [hasHiringDelay, setHasHiringDelay] = useState(hiringDelay > 0);
+
+  // Roles de fallback si no hay datos de la API
+  const fallbackRoles = [
+    'Software Developer',
+    'QA Tester', 
+    'DevOps Engineer',
+    'Business Analyst',
+    'Data Scientist',
+    'Cloud Engineer',
+    'Software Architect',
+    'UX/UI Designer'
+  ];
+
+  // Seniorities de fallback si no hay datos de la API
+  const fallbackSeniorities = ['junior', 'mid', 'senior'];
+
+  const roles = availableRoles.length > 0 ? availableRoles : fallbackRoles;
+  const seniorities = availableSeniorities.length > 0 ? availableSeniorities : fallbackSeniorities;
+
+  // Actualizar hiring delay cuando cambia el switch
+  const handleHiringDelayChange = (checked: boolean) => {
+    setHasHiringDelay(checked);
+    if (!checked) {
+      setHiringDelay(0);
+    } else if (hiringDelay === 0) {
+      setHiringDelay(3); // Valor por defecto
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="p-8 space-y-8">
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-sm text-gray-600">Cargando datos disponibles...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 space-y-8">
+        <div className="text-center py-8">
+          <div className="text-red-600 mb-2">⚠️ Error al cargar datos</div>
+          <p className="text-sm text-gray-600">{error}</p>
+          <p className="text-xs text-gray-500 mt-2">Usando datos de respaldo</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 space-y-8">
@@ -82,8 +143,8 @@ export const TeamConfiguration = ({
                   </SelectTrigger>
                   <SelectContent>
                     {roles.map((role) => (
-                      <SelectItem key={role.value} value={role.value}>
-                        {role.label}
+                      <SelectItem key={role} value={role}>
+                        {role}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -103,8 +164,8 @@ export const TeamConfiguration = ({
                   </SelectTrigger>
                   <SelectContent>
                     {seniorities.map((seniority) => (
-                      <SelectItem key={seniority.value} value={seniority.value}>
-                        {seniority.label}
+                      <SelectItem key={seniority} value={seniority}>
+                        {seniority}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -158,7 +219,7 @@ export const TeamConfiguration = ({
           </Label>
           <Switch
             checked={hasHiringDelay}
-            onCheckedChange={setHasHiringDelay}
+            onCheckedChange={handleHiringDelayChange}
             className="data-[state=checked]:bg-[#2e4bce]"
           />
         </div>
@@ -168,7 +229,10 @@ export const TeamConfiguration = ({
             <Label className="text-sm font-medium text-gray-700">
               Tiempo de demora
             </Label>
-            <Select value={hiringDelayMonths} onValueChange={setHiringDelayMonths}>
+            <Select 
+              value={hiringDelay.toString()} 
+              onValueChange={(value) => setHiringDelay(parseInt(value))}
+            >
               <SelectTrigger className="w-32">
                 <SelectValue />
               </SelectTrigger>
@@ -176,6 +240,8 @@ export const TeamConfiguration = ({
                 <SelectItem value="1">1 mes</SelectItem>
                 <SelectItem value="2">2 meses</SelectItem>
                 <SelectItem value="3">3 meses</SelectItem>
+                <SelectItem value="4">4 meses</SelectItem>
+                <SelectItem value="6">6 meses</SelectItem>
               </SelectContent>
             </Select>
           </div>

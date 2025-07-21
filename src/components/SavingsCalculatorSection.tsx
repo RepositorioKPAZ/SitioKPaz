@@ -10,6 +10,8 @@ export const SavingsCalculatorSection = () => {
   const {
     projectDuration,
     setProjectDuration,
+    hiringDelay,
+    setHiringDelay,
     teamMembers,
     addTeamMember,
     removeTeamMember,
@@ -17,7 +19,12 @@ export const SavingsCalculatorSection = () => {
     totalInternalCost,
     totalSavings,
     totalOutsourcingCost,
-    savingsPercentage
+    savingsPercentage,
+    availableRoles,
+    availableSeniorities,
+    loading: teamLoading,
+    error,
+    perfilesData // Obtener datos de perfiles
   } = useSavingsCalculator();
 
   return (
@@ -58,10 +65,16 @@ export const SavingsCalculatorSection = () => {
               <TeamConfiguration
                 projectDuration={projectDuration}
                 setProjectDuration={setProjectDuration}
+                hiringDelay={hiringDelay}
+                setHiringDelay={setHiringDelay}
                 teamMembers={teamMembers}
                 addTeamMember={addTeamMember}
                 removeTeamMember={removeTeamMember}
                 updateTeamMember={updateTeamMember}
+                availableRoles={availableRoles}
+                availableSeniorities={availableSeniorities}
+                loading={teamLoading}
+                error={error}
               />
             </CardContent>
           </Card>
@@ -73,6 +86,9 @@ export const SavingsCalculatorSection = () => {
             totalSavings={totalSavings}
             totalOutsourcingCost={totalOutsourcingCost}
             savingsPercentage={savingsPercentage}
+            projectDuration={projectDuration}
+            hiringDelay={hiringDelay}
+            perfilesData={perfilesData}
           />
         </div>
 
