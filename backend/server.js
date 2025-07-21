@@ -3,6 +3,10 @@ const mysql = require('mysql2/promise');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
+const PDFDocument = require('pdfkit');
+const nodemailer = require('nodemailer');
+const multer = require('multer');
+const upload = multer();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -21,6 +25,130 @@ const limiter = rateLimit({
   max: 100 // máximo 100 requests por ventana
 });
 app.use(limiter);
+app.use(express.json());
+
+// Endpoint para enviar análisis detallado por correo (ahora acepta PDF adjunto)
+app.post('/api/send-analysis', upload.single('pdf'), async (req, res) => {
+  console.log('req.body:', req.body);
+  console.log('req.file:', req.file);
+  try {
+    // Los datos del formulario vienen en req.body.data (string JSON)
+    if (!req.body.data) {
+      return res.status(400).json({ success: false, message: 'No se recibieron los datos del formulario.' });
+    }
+    let data;
+    try {
+      data = JSON.parse(req.body.data);
+    } catch (e) {
+      return res.status(400).json({ success: false, message: 'El campo data no es un JSON válido.' });
+    }
+    const { name, email } = data;
+    if (!name || !email) {
+      return res.status(400).json({ success: false, message: 'Nombre y email son obligatorios' });
+    }
+    // El PDF viene en req.file
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No se adjuntó el PDF.' });
+    }
+    // 2. Configurar nodemailer
+    console.log('Intentando conectar con SMTP usando:');
+    console.log('  Usuario:', process.env.SMTP_USER);
+    console.log('  Servidor:', process.env.SMTP_HOST);
+    console.log('  Contraseña:', process.env.SMTP_PASS ? process.env.SMTP_PASS.substring(0,3) + '...' : 'NO DEFINIDA');
+    let transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+    // 3. Enviar correo con el PDF recibido
+    let mailOptions = {
+      from: process.env.SMTP_FROM || 'no-reply@kpaz.la',
+      to: email,
+      cc: process.env.SMTP_CC || 'contacto@kpaz.la',
+      subject: 'Tu análisis detallado de ahorro KPaz',
+      text: `Hola ${name},\n\nAdjuntamos el análisis detallado solicitado. Nuestro equipo se pondrá en contacto contigo para conversar sobre los resultados.`,
+      attachments: [
+        {
+          filename: 'calculo-ahorro-kpaz.pdf',
+          content: req.file.buffer
+        }
+      ]
+    };
+    try {
+      await transporter.sendMail(mailOptions);
+      res.json({ success: true, message: '¡Perfecto! En breve recibirás el análisis detallado en tu email.' });
+    } catch (err) {
+      console.error('Error enviando correo:', err);
+      res.status(500).json({ success: false, message: 'Error enviando el correo.' });
+    }
+  } catch (error) {
+    console.error('Error en /api/send-analysis:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+app.post('/api/contact', async (req, res) => {
+  try {
+    const { name, company, email, phone, message } = req.body;
+    if (!name || !company || !email || !phone || !message) {
+      return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios.' });
+    }
+    let transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+    let mailOptions = {
+      from: process.env.SMTP_FROM || 'no-reply@kpaz.la',
+      to: 'rdelafuente@kpaz.cl',
+      subject: 'Nuevo mensaje de contacto desde el sitio web',
+      text: `Nombre: ${name}\nEmpresa: ${company}\nEmail: ${email}\nTeléfono: ${phone}\nMensaje: ${message}`
+    };
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true, message: 'Mensaje enviado correctamente.' });
+  } catch (error) {
+    console.error('Error en /api/contact:', error);
+    res.status(500).json({ success: false, message: 'Error enviando el mensaje.' });
+  }
+});
+
+app.post('/api/newsletter', async (req, res) => {
+  try {
+    const { name, position, compania, phone, email } = req.body;
+    if (!name || !position || !compania || !phone || !email) {
+      return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios.' });
+    }
+    let transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+    let mailOptions = {
+      from: process.env.SMTP_FROM || 'no-reply@kpaz.la',
+      to: 'rdelafuente@kpaz.cl',
+      subject: 'Suscripción a Newsletter',
+      text: `Nombre: ${name}\nCargo: ${position}\nCompañía: ${compania}\nTeléfono: ${phone}\nEmail: ${email}`
+    };
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true, message: 'Suscripción enviada correctamente.' });
+  } catch (error) {
+    console.error('Error en /api/newsletter:', error);
+    res.status(500).json({ success: false, message: 'Error enviando la suscripción.' });
+  }
+});
+
 
 // Middleware para logging
 app.use((req, res, next) => {
@@ -29,7 +157,7 @@ app.use((req, res, next) => {
 });
 
 // Middleware para parsear JSON
-app.use(express.json());
+
 
 // Configuración de la base de datos
 const dbConfig = {

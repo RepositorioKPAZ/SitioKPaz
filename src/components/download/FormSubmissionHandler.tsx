@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from "react";
 import { SecureDownloadFormData } from "@/utils/secureFormValidation";
 import { downloadsService, DownloadForm } from "@/services/api";
-import { downloadSavingsPDF } from "@/utils/pdfGenerator";
+import { downloadSavingsPDF, getSavingsPDFBlob } from "@/utils/pdfGenerator";
 
 interface FormSubmissionHandlerProps {
   onSubmit: (data: SecureDownloadFormData, calculationData: any) => Promise<void>;
@@ -38,6 +38,8 @@ export const FormSubmissionHandler = React.memo(({
     console.log("Datos del cálculo:", calculationData);
     console.log("Datos de perfiles:", perfilesData.length);
 
+      
+
     try {
       // Verificar conexión con el backend primero
       console.log("🔍 Verificando conexión con el backend...");
@@ -47,8 +49,8 @@ export const FormSubmissionHandler = React.memo(({
       if (!healthCheck.ok) {
         throw new Error(`Backend no responde: ${healthCheck.status}`);
       }
-
-      // Guardar en la base de datos
+      console.log("Paso el IF");
+      // Guardar en la base de datos y enviar PDF por correo
       const downloadData: DownloadForm = {
         name: data.name,
         company: data.company || undefined,
@@ -64,26 +66,48 @@ export const FormSubmissionHandler = React.memo(({
           cantidad: p.quantity != null ? p.quantity : 1
         })) || []
       };
-
-      console.log("📊 Datos a guardar en BD:", downloadData);
-      console.log("🌐 URL de la API:", 'http://localhost:3001/api/downloads');
       
-      const result = await downloadsService.save(downloadData);
-      console.log("✅ Download guardado con ID:", result.id);
+      
 
-      // Generar y descargar PDF
-      console.log("📄 Generando PDF...");
-      console.log("📄 Datos de cálculo para PDF:", calculationData);
-      console.log("📄 Datos del formulario para PDF:", downloadData);
-      console.log("📄 Datos de perfiles para PDF:", perfilesData.length);
-      downloadSavingsPDF(calculationData, {
-        ...downloadData,
-        projectStartDate: data.projectStartDate ? (typeof data.projectStartDate === 'string' ? data.projectStartDate : new Date(data.projectStartDate).toISOString().split('T')[0]) : undefined
-      }, perfilesData);
-      console.log("✅ PDF generado y descargado");
+      /* const response = await fetch('http://localhost:3001/api/send-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(downloadData)
+      });*/
+  
 
-      // Continuar con el flujo normal
-      await onSubmit(data, calculationData);
+      /*const result = await response.json();
+       if (response.ok && result.success) {*/
+        //alert(result.message || '¡Perfecto! En breve recibirás el análisis detallado en tu email.');
+        // Descargar PDF en el navegador
+        downloadSavingsPDF(calculationData, {
+          ...downloadData,
+          projectStartDate: data.projectStartDate ? (typeof data.projectStartDate === 'string' ? data.projectStartDate : new Date(data.projectStartDate).toISOString().split('T')[0]) : undefined
+        }, perfilesData);
+
+
+        // Enviar PDF al backend como archivo adjunto
+        const pdfBlob = await getSavingsPDFBlob(calculationData, {
+          ...downloadData,
+          projectStartDate: data.projectStartDate ? (typeof data.projectStartDate === 'string' ? data.projectStartDate : new Date(data.projectStartDate).toISOString().split('T')[0]) : undefined
+        }, perfilesData);
+        const formData = new FormData();
+        formData.append('pdf', pdfBlob, 'calculo-ahorro-kpaz.pdf');
+        formData.append('data', JSON.stringify(downloadData));
+
+        console.log('FormData keys:', Array.from(formData.keys()));
+        console.log('FormData data:', formData.get('data'));
+        console.log('FormData pdf:', formData.get('pdf'));
+
+        await fetch('http://localhost:3001/api/send-analysis', {
+          method: 'POST',
+          body: formData
+        });
+        await onSubmit(data, calculationData);
+      /*} else {
+        throw new Error(result.message || 'Error enviando el análisis.');
+        console.log("En el ");
+      }*/
       
     } catch (error) {
       console.error("❌ Error en el proceso:", error);
