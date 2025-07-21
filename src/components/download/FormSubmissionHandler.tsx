@@ -55,7 +55,14 @@ export const FormSubmissionHandler = React.memo(({
         position: data.position || undefined,
         email: data.email,
         phone: data.phone || undefined,
-        project_start_date: data.projectStartDate ? new Date(data.projectStartDate).toISOString().split('T')[0] : undefined
+        project_start_date: data.projectStartDate ? (typeof data.projectStartDate === 'string' ? data.projectStartDate : new Date(data.projectStartDate).toISOString().split('T')[0]) : undefined,
+        DelayInterno: calculationData.hiringDelay,
+        DuracionProyecto: Array.isArray(calculationData.projectDuration) ? calculationData.projectDuration[0] : calculationData.projectDuration,
+        profiles: calculationData.teamMembers?.map((p: any) => ({
+          rol: p.role,
+          seniority: p.seniority,
+          cantidad: p.quantity != null ? p.quantity : 1
+        })) || []
       };
 
       console.log("📊 Datos a guardar en BD:", downloadData);
@@ -71,7 +78,7 @@ export const FormSubmissionHandler = React.memo(({
       console.log("📄 Datos de perfiles para PDF:", perfilesData.length);
       downloadSavingsPDF(calculationData, {
         ...downloadData,
-        projectStartDate: data.projectStartDate // Asegura que el PDF reciba la fecha
+        projectStartDate: data.projectStartDate ? (typeof data.projectStartDate === 'string' ? data.projectStartDate : new Date(data.projectStartDate).toISOString().split('T')[0]) : undefined
       }, perfilesData);
       console.log("✅ PDF generado y descargado");
 

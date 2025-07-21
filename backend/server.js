@@ -228,7 +228,7 @@ app.post('/api/downloads', async (req, res) => {
   try {
     console.log('📥 Recibiendo datos de download:', req.body);
     
-    const { name, company, position, email, phone, project_start_date } = req.body;
+    const { name, company, position, email, phone, project_start_date, profiles, DelayInterno, DuracionProyecto } = req.body;
     
     // Validar campos obligatorios
     if (!name || !email) {
@@ -249,16 +249,38 @@ app.post('/api/downloads', async (req, res) => {
     
     // Insertar en la base de datos (sin validación de email único)
     const [result] = await pool.execute(
-      'INSERT INTO downloads (name, company, position, email, phone, project_start_date) VALUES (?, ?, ?, ?, ?, ?)',
-      [name, company || null, position || null, email, phone || null, project_start_date || null]
+      'INSERT INTO downloads (name, company, position, email, phone, project_start_date, DelayInterno, DuracionProyecto) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [name, company || null, position || null, email, phone || null, project_start_date || null, DelayInterno || null, DuracionProyecto || null]
     );
     
-    console.log('✅ Download guardado con ID:', result.insertId);
+    const downloadId = result.insertId;
+    console.log('✅ Download guardado con ID:', downloadId);
+    
+    // Guardar perfiles seleccionados si existen
+    if (Array.isArray(profiles) && profiles.length > 0) {
+      for (const profile of profiles) {
+        // Solo guardar si el rol está presente y no es vacío
+        if (profile.rol && typeof profile.rol === 'string' && profile.rol.trim() !== '') {
+          await pool.execute(
+            'INSERT INTO download_profiles (download_id, rol, seniority, cantidad) VALUES (?, ?, ?, ?)',
+            [
+              downloadId,
+              profile.rol,
+              profile.seniority ?? null,
+              profile.cantidad != null ? profile.cantidad : 1
+            ]
+          );
+        } else {
+          console.warn(`Perfil omitido por rol vacío o nulo:`, profile);
+        }
+      }
+      console.log(`✅ ${profiles.length} perfiles procesados en download_profiles para download_id ${downloadId}`);
+    }
     
     res.json({
       success: true,
       message: 'Información guardada exitosamente',
-      data: { id: result.insertId }
+      data: { id: downloadId }
     });
     
   } catch (error) {
