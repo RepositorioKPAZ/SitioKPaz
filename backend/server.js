@@ -13,11 +13,28 @@ const PORT = process.env.PORT || 3001;
 
 // Configuración de CORS
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:4173', 'http://127.0.0.1:5173', 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:8081', 'http://127.0.0.1:8081', 'http://localhost:8080', 'http://127.0.0.1:8080'],
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'http://127.0.0.1:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:8081',
+    'http://127.0.0.1:8081',
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+    'https://kpazserv0015-a8htfrascdgsczf3.eastus-01.azurewebsites.net'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Texto extra
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
+
+
 
 // Rate limiting
 const limiter = rateLimit({
@@ -235,19 +252,20 @@ async function initializeDatabase() {
 // Ruta para obtener todos los perfiles
 app.get('/api/perfiles', async (req, res) => {
   try {
-    const [rows] = await pool.execute('SELECT * FROM perfiles ORDER BY rol, seniority');
-    res.json({
-      success: true,
-      data: rows,
-      message: `${rows.length} perfiles encontrados`
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
     });
+
+    const [rows] = await connection.execute('SELECT * FROM perfiles');
+    await connection.end();
+
+    res.json({ data: rows, message: 'Perfiles cargados correctamente' });
   } catch (error) {
-    console.error('Error obteniendo perfiles:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    });
+    console.error('Error en /api/perfiles:', error);
+    res.status(500).json({ message: 'Error cargando perfiles', error: error.message });
   }
 });
 
@@ -437,6 +455,11 @@ app.get('/api/downloads', async (req, res) => {
       message: 'Error interno del servidor'
     });
   }
+});
+
+// Catch-all para SPA (React Router)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Inicializar servidor
