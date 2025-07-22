@@ -35,6 +35,17 @@ export interface DownloadForm {
   email: string;
   phone?: string;
   project_start_date?: string;
+  DelayInterno?: number;
+  DuracionProyecto?: number;
+  /**
+   * Perfiles seleccionados por el usuario al descargar el análisis
+   */
+  profiles?: Array<{
+    id?: number;
+    rol: string;
+    seniority: string;
+    cantidad?: number;
+  }>;
 }
 
 // Configuración de la API

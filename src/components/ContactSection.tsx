@@ -80,16 +80,25 @@ export const ContactSection = () => {
       });
       console.log("Secure form submitted:", formData);
 
-      // Simulate submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      alert("¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.");
-      setFormData({
-        name: "",
-        company: "",
-        email: "",
-        phone: "",
-        message: ""
+      // Enviar al backend
+      const response = await fetch('http://localhost:3001/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
       });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        alert("¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.");
+        setFormData({
+          name: "",
+          company: "",
+          email: "",
+          phone: "",
+          message: ""
+        });
+      } else {
+        alert(result.message || "Hubo un error al enviar el formulario. Por favor, inténtalo nuevamente.");
+      }
     } catch (error) {
       SecurityUtils.logSecurityEvent('FORM_SUBMISSION_ERROR', {
         form: 'contact',

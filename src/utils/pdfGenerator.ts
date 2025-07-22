@@ -275,4 +275,17 @@ export const downloadSavingsPDF = (
 ) => {
   const doc = generateSavingsPDF(calculationData, formData, perfilesData);
   doc.save('calculo-ahorro-kpaz.pdf');
+};
+
+export const getSavingsPDFBlob = (
+  calculationData: CalculationData,
+  formData: DownloadFormData,
+  perfilesData: any[] = []
+): Promise<Blob> => {
+  const doc = generateSavingsPDF(calculationData, formData, perfilesData);
+  return new Promise((resolve) => {
+    const pdfArrayBuffer = doc.output('arraybuffer');
+    const blob = new Blob([pdfArrayBuffer], { type: 'application/pdf' });
+    resolve(blob);
+  });
 }; 
