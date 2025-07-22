@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback } from "react";
 import { SecureDownloadFormData } from "@/utils/secureFormValidation";
-import { downloadsService, DownloadForm } from "@/services/api";
+import { downloadsService, DownloadForm, API_BASE_URL } from "@/services/api";
 import { downloadSavingsPDF, getSavingsPDFBlob } from "@/utils/pdfGenerator";
 
 interface FormSubmissionHandlerProps {
@@ -43,7 +43,7 @@ export const FormSubmissionHandler = React.memo(({
     try {
       // Verificar conexión con el backend primero
       console.log("🔍 Verificando conexión con el backend...");
-      const healthCheck = await fetch('http://localhost:3001/api/health');
+      const healthCheck = await fetch(`${API_BASE_URL}/health`);
       console.log("Health check status:", healthCheck.status);
       
       if (!healthCheck.ok) {
@@ -69,11 +69,7 @@ export const FormSubmissionHandler = React.memo(({
       
       
 
-      /* const response = await fetch('http://localhost:3001/api/send-analysis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(downloadData)
-      });*/
+   
   
 
       /*const result = await response.json();
@@ -99,7 +95,7 @@ export const FormSubmissionHandler = React.memo(({
         console.log('FormData data:', formData.get('data'));
         console.log('FormData pdf:', formData.get('pdf'));
 
-        await fetch('http://localhost:3001/api/send-analysis', {
+        await fetch(`${API_BASE_URL}/send-analysis`, {
           method: 'POST',
           body: formData
         });

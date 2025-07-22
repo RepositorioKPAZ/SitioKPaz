@@ -8,6 +8,7 @@ import { useState, useCallback } from "react";
 import { SecurityUtils, RateLimiter } from "@/utils/security";
 import { createSecureContactSchema, type SecureContactFormData } from "@/utils/secureFormValidation";
 import { SecurityErrorBoundary } from "@/components/security/SecurityErrorBoundary";
+import { API_BASE_URL } from "@/services/api";
 export const ContactSection = () => {
   const [formData, setFormData] = useState<SecureContactFormData>({
     name: "",
@@ -63,8 +64,9 @@ export const ContactSection = () => {
 
     // Rate limiting check
     const clientId = `contact_${formData.email}`;
-    if (!RateLimiter.canAttempt(clientId, 3, 300000)) {
-      // 3 attempts per 5 minutes
+   // if (!RateLimiter.canAttempt(clientId, 3, 300000)) {
+    if (!RateLimiter.canAttempt(clientId, 30, 300000)) {
+        // 3 attempts per 5 minutes
       alert("Has realizado demasiados intentos. Por favor, espera unos minutos antes de intentar nuevamente.");
       return;
     }
@@ -81,8 +83,9 @@ export const ContactSection = () => {
       console.log("Secure form submitted:", formData);
 
       // Enviar al backend
-      const response = await fetch('http://localhost:3001/api/contact', {
-        method: 'POST',
+      //const response = await fetch('https://kpazserv0018-djcqb2ecg5hfgcdw.eastus-01.azurewebsites.net/api/contact', {
+      const response = await fetch(`${API_BASE_URL}/contact`, {
+          method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });

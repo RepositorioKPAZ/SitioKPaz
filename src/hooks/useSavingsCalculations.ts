@@ -21,7 +21,7 @@ export const useSavingsCalculations = (teamMembers: TeamMember[], projectDuratio
         setLoading(true);
         const perfiles = await perfilesService.getAll();
         setPerfilesData(perfiles);
-        console.log('📊 Perfiles cargados para cálculos:', perfiles.length);
+        //console.log('📊 Perfiles cargados para cálculos:', perfiles.length);
       } catch (error) {
         console.error('Error cargando perfiles para cálculos:', error);
       } finally {
@@ -34,7 +34,7 @@ export const useSavingsCalculations = (teamMembers: TeamMember[], projectDuratio
 
   // Función para obtener tarifa por rol y seniority
   const getTarifaByRolAndSeniority = (rol: string, seniority: string): { tarifa: number, costoMes: number } => {
-    console.log(`🔍 Buscando tarifa y costo_mes para: ${rol} | ${seniority}`);
+    //console.log(`🔍 Buscando tarifa y costo_mes para: ${rol} | ${seniority}`);
     
     // Buscar perfil exacto que coincida con rol y seniority
     const perfil = perfilesData.find(p => 
@@ -42,7 +42,7 @@ export const useSavingsCalculations = (teamMembers: TeamMember[], projectDuratio
     );
     
     if (perfil) {
-      console.log(`✅ Encontrado exacto: ${perfil.rol} | ${perfil.seniority} | tarifa: $${perfil.tarifa_usd} | costo_mes: $${perfil.costo_mes || 'N/A'}`);
+      //console.log(`✅ Encontrado exacto: ${perfil.rol} | ${perfil.seniority} | tarifa: $${perfil.tarifa_usd} | costo_mes: $${perfil.costo_mes || 'N/A'}`);
       return { 
         tarifa: perfil.tarifa_usd || 0,
         costoMes: perfil.costo_mes || 0
@@ -52,7 +52,7 @@ export const useSavingsCalculations = (teamMembers: TeamMember[], projectDuratio
     // Si no encuentra coincidencia exacta, buscar solo por rol y aplicar multiplicador
     const perfilPorRol = perfilesData.find(p => p.rol === rol);
     if (perfilPorRol) {
-      console.log(`⚠️ No encontrado exacto, usando por rol: ${perfilPorRol.rol} | tarifa: $${perfilPorRol.tarifa_usd} | costo_mes: $${perfilPorRol.costo_mes || 'N/A'}`);
+      //console.log(`⚠️ No encontrado exacto, usando por rol: ${perfilPorRol.rol} | tarifa: $${perfilPorRol.tarifa_usd} | costo_mes: $${perfilPorRol.costo_mes || 'N/A'}`);
       const multiplicador = seniorityMultipliers[seniority as keyof typeof seniorityMultipliers] || 1.0;
       return { 
         tarifa: (perfilPorRol.tarifa_usd || 0) * multiplicador,
@@ -60,14 +60,14 @@ export const useSavingsCalculations = (teamMembers: TeamMember[], projectDuratio
       };
     }
     
-    console.log(`❌ No encontrado perfil para: ${rol} | ${seniority}`);
+    //console.log(`❌ No encontrado perfil para: ${rol} | ${seniority}`);
     return { tarifa: 0, costoMes: 0 };
   };
 
   // Memoizar los cálculos principales para evitar re-cálculos innecesarios
   const calculations = useMemo(() => {
     if (loading || perfilesData.length === 0) {
-      console.log('⏳ Cargando datos de perfiles...');
+      //console.log('⏳ Cargando datos de perfiles...');
       return {
         totalInternalCost: 0,
         totalSavings: 0,
@@ -76,36 +76,36 @@ export const useSavingsCalculations = (teamMembers: TeamMember[], projectDuratio
       };
     }
 
-    console.log('🧮 Iniciando cálculos con perfiles:', perfilesData.length);
-    console.log('📋 Datos de perfiles disponibles:', perfilesData.map(p => `${p.rol} | ${p.seniority} | $${p.tarifa_usd}`));
+    //console.log('🧮 Iniciando cálculos con perfiles:', perfilesData.length);
+    //console.log('📋 Datos de perfiles disponibles:', perfilesData.map(p => `${p.rol} | ${p.seniority} | $${p.tarifa_usd}`));
 
     // Calcular costo con KPaz (usando tarifas de la base de datos)
     const totalOutsourcingCost = teamMembers.reduce((total, member) => {
-      console.log(`\n🔍 Procesando miembro: ${member.role} | ${member.seniority} | x${member.quantity}`);
+      //console.log(`\n🔍 Procesando miembro: ${member.role} | ${member.seniority} | x${member.quantity}`);
       
       // Obtener tarifa base desde la base de datos
       const { tarifa, costoMes } = getTarifaByRolAndSeniority(member.role, member.seniority);
-      console.log(`💰 Tarifa base obtenida: $${tarifa}`);
+      //console.log(`💰 Tarifa base obtenida: $${tarifa}`);
       
       // Si no hay tarifa en la base de datos, usar fallback
       const tarifaFinal = tarifa > 0 ? tarifa : (5000 * (seniorityMultipliers[member.seniority as keyof typeof seniorityMultipliers] || 1.0));
-      console.log(`💵 Tarifa final a usar: $${tarifaFinal}`);
+      //console.log(`💵 Tarifa final a usar: $${tarifaFinal}`);
       
       // Calcular costo mensual por miembro
       const costoMensual = tarifaFinal * member.quantity;
-      console.log(`📅 Costo mensual: $${tarifaFinal} x ${member.quantity} = $${costoMensual}`);
+      //console.log(`📅 Costo mensual: $${tarifaFinal} x ${member.quantity} = $${costoMensual}`);
       
       // Calcular costo total para la duración del proyecto (multiplicar por meses)
       const duracionMeses = projectDuration[0];
       const costoTotal = costoMensual * duracionMeses;
-      console.log(`⏱️ Duración: ${duracionMeses} meses → Costo total: $${costoTotal}`);
+      //console.log(`⏱️ Duración: ${duracionMeses} meses → Costo total: $${costoTotal}`);
       
-      console.log(`💰 ${member.role} (${member.seniority}) x${member.quantity}: $${tarifaFinal} → $${costoMensual}/mes → $${costoTotal} total`);
+      //console.log(`💰 ${member.role} (${member.seniority}) x${member.quantity}: $${tarifaFinal} → $${costoMensual}/mes → $${costoTotal} total`);
       
       return total + costoTotal;
     }, 0);
 
-    console.log(`\n📊 Total costo con KPaz: $${totalOutsourcingCost}`);
+    //console.log(`\n📊 Total costo con KPaz: $${totalOutsourcingCost}`);
 
     // Calcular costo interno de referencia (más alto)
     const totalInternalCost = teamMembers.reduce((total, member) => {
@@ -119,17 +119,17 @@ export const useSavingsCalculations = (teamMembers: TeamMember[], projectDuratio
       const duracionMeses = projectDuration[0] + hiringDelay; // Sumar meses de demora en contratación
       const costoTotal = costoMensual * duracionMeses;
       
-      console.log(`🏢 Costo interno desde DB: ${member.role} (${member.seniority}) x${member.quantity}: $${costoMesFinal}/mes → $${costoTotal} total (${projectDuration[0]} + ${hiringDelay} meses)`);
+      //console.log(`🏢 Costo interno desde DB: ${member.role} (${member.seniority}) x${member.quantity}: $${costoMesFinal}/mes → $${costoTotal} total (${projectDuration[0]} + ${hiringDelay} meses)`);
       
       return total + costoTotal;
     }, 0);
 
-    console.log(`📊 Total costo interno desde DB: $${totalInternalCost}`);
+    //console.log(`📊 Total costo interno desde DB: $${totalInternalCost}`);
 
     const savingsPercentage = 27.8;
     const totalSavings = totalInternalCost - totalOutsourcingCost;
 
-    console.log(`📊 Cálculo final: Interno $${totalInternalCost} → KPaz $${totalOutsourcingCost} (Ahorro $${totalSavings})`);
+    //console.log(`📊 Cálculo final: Interno $${totalInternalCost} → KPaz $${totalOutsourcingCost} (Ahorro $${totalSavings})`);
 
     return {
       totalInternalCost,

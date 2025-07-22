@@ -11,7 +11,7 @@ export interface TeamMember {
 
 export const useTeamManagement = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
-    { id: '1', role: 'software-developer', seniority: 'mid', quantity: 2 }
+    { id: '1', role: 'Analistas de Datos', seniority: 'mid', quantity: 1 }
   ]);
   
   const [availableRoles, setAvailableRoles] = useState<string[]>([]);

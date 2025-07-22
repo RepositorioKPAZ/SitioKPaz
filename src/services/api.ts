@@ -49,7 +49,7 @@ export interface DownloadForm {
 }
 
 // Configuración de la API
-const API_BASE_URL = 'http://localhost:3001/api';
+export const API_BASE_URL = 'https://kpazserv0018-djcqb2ecg5hfgcdw.eastus-01.azurewebsites.net/api';
 
 // Función para manejar errores de fetch
 const handleResponse = async (response: Response) => {
