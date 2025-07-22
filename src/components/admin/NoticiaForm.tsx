@@ -7,6 +7,7 @@ interface IFormData {
   resumen: string;
   contenido: string;
   urlImagen: string;
+  categoria: string;
   esDestacada: boolean;
 }
 
@@ -20,6 +21,7 @@ const NoticiaForm: React.FC = () => {
     resumen: '',
     contenido: '',
     urlImagen: '',
+    categoria: '',
     esDestacada: false,
   });
 
@@ -41,7 +43,7 @@ const NoticiaForm: React.FC = () => {
     }
   }, [id, isEditing]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     // Manejo especial para el checkbox
     const inputValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
@@ -68,31 +70,46 @@ const NoticiaForm: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <div className="form-container">
-        <h1>{isEditing ? 'Editar Noticia' : 'Crear Nueva Noticia'}</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="titulo">Título</label>
-            <input type="text" id="titulo" name="titulo" value={formData.titulo} onChange={handleChange} required />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center py-12 px-4">
+      <div className="w-full max-w-2xl bg-white/90 rounded-3xl shadow-2xl p-8 border border-gray-100">
+        <h1 className="text-2xl font-bold mb-6 bg-gradient-to-r from-[#2e4bce] to-[#1e3a9e] bg-clip-text text-transparent">{isEditing ? 'Editar Noticia' : 'Crear Nueva Noticia'}</h1>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 mb-1">Título</label>
+            <input type="text" id="titulo" name="titulo" value={formData.titulo} onChange={handleChange} required className="w-full rounded-xl border-gray-200 px-4 py-2 shadow-sm focus:ring-2 focus:ring-blue-200" />
           </div>
-          <div className="form-group">
-            <label htmlFor="resumen">Resumen</label>
-            <textarea id="resumen" name="resumen" value={formData.resumen} onChange={handleChange} required />
+          <div>
+            <label htmlFor="resumen" className="block text-sm font-medium text-gray-700 mb-1">Resumen</label>
+            <textarea id="resumen" name="resumen" value={formData.resumen} onChange={handleChange} required className="w-full rounded-xl border-gray-200 px-4 py-2 shadow-sm focus:ring-2 focus:ring-blue-200" />
           </div>
-          <div className="form-group">
-            <label htmlFor="contenido">Contenido Completo</label>
-            <textarea id="contenido" name="contenido" value={formData.contenido} onChange={handleChange} required />
+          <div>
+            <label htmlFor="contenido" className="block text-sm font-medium text-gray-700 mb-1">Contenido Completo</label>
+            <textarea id="contenido" name="contenido" value={formData.contenido} onChange={handleChange} required className="w-full rounded-xl border-gray-200 px-4 py-2 shadow-sm focus:ring-2 focus:ring-blue-200 min-h-[100px]" />
           </div>
-          <div className="form-group">
-            <label htmlFor="urlImagen">URL de la Imagen</label>
-            <input type="text" id="urlImagen" name="urlImagen" value={formData.urlImagen} onChange={handleChange} required />
+          <div>
+            <label htmlFor="urlImagen" className="block text-sm font-medium text-gray-700 mb-1">URL de la Imagen</label>
+            <input type="text" id="urlImagen" name="urlImagen" value={formData.urlImagen} onChange={handleChange} required className="w-full rounded-xl border-gray-200 px-4 py-2 shadow-sm focus:ring-2 focus:ring-blue-200" />
           </div>
-          <div className="form-group-check">
-            <input type="checkbox" id="esDestacada" name="esDestacada" checked={formData.esDestacada} onChange={handleChange} />
-            <label htmlFor="esDestacada">Marcar como noticia destacada</label>
+          <div>
+            <label htmlFor="categoria" className="block text-sm font-medium text-gray-700 mb-1">Categoría (Alianza)</label>
+            <select id="categoria" name="categoria" value={formData.categoria} onChange={handleChange} required className="w-full rounded-xl border-gray-200 px-4 py-2 shadow-sm focus:ring-2 focus:ring-blue-200">
+              <option value="">Selecciona una alianza</option>
+              <option value="Microsoft">Microsoft</option>
+              <option value="Amazon Web Services">Amazon Web Services</option>
+              <option value="Google">Google</option>
+              <option value="UiPath">UiPath</option>
+              <option value="Rocketbot">Rocketbot</option>
+              <option value="Kore.AI">Kore.AI</option>
+              <option value="OutSystems">OutSystems</option>
+              <option value="Genexus">Genexus</option>
+              <option value="Salesforce">Salesforce</option>
+            </select>
           </div>
-          <button type="submit" className="btn-submit">{isEditing ? 'Actualizar' : 'Crear'}</button>
+          <div className="flex items-center gap-3">
+            <input type="checkbox" id="esDestacada" name="esDestacada" checked={formData.esDestacada} onChange={handleChange} className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+            <label htmlFor="esDestacada" className="text-sm font-medium text-gray-700">Marcar como noticia destacada</label>
+          </div>
+          <button type="submit" className="w-full bg-gradient-to-r from-[#2e4bce] to-[#1e3a9e] text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:from-[#1e3a9e] hover:to-[#0f2657] transition-all duration-300">{isEditing ? 'Actualizar' : 'Crear'}</button>
         </form>
       </div>
     </div>

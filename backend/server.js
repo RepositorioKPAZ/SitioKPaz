@@ -220,6 +220,30 @@ async function initializeDatabase() {
         console.log(`Tabla perfiles tiene ${rows[0].count} registros.`);
       }
     }
+
+    // Verificar si la tabla noticias existe
+    const [noticiasTable] = await pool.execute(`
+      SELECT COUNT(*) as count 
+      FROM information_schema.tables 
+      WHERE table_schema = ? AND table_name = 'noticias'
+    `, [dbConfig.database]);
+
+    if (noticiasTable[0].count === 0) {
+      await pool.execute(`
+        CREATE TABLE noticias (
+          id int NOT NULL AUTO_INCREMENT,
+          titulo varchar(255) NOT NULL,
+          resumen text NOT NULL,
+          contenido text NOT NULL,
+          urlImagen varchar(512) DEFAULT NULL,
+          categoria varchar(100) NOT NULL,
+          esDestacada boolean DEFAULT false,
+          created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (id)
+        )
+      `);
+      console.log('✅ Tabla noticias creada');
+    }
     
     console.log('Base de datos inicializada correctamente');
   } catch (error) {
@@ -329,6 +353,96 @@ app.get('/api/perfiles/:id', async (req, res) => {
       message: 'Error interno del servidor',
       error: error.message
     });
+  }
+});
+
+// --- ENDPOINTS DE NOTICIAS ---
+// Obtener todas las noticias
+app.get('/api/noticias', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM noticias ORDER BY created_at DESC');
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    console.error('Error obteniendo noticias:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+// Obtener noticia por ID
+app.get('/api/noticias/:id', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM noticias WHERE id = ?', [req.params.id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Noticia no encontrada' });
+    }
+    res.json({ success: true, data: rows[0] });
+  } catch (error) {
+    console.error('Error obteniendo noticia por ID:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+// Obtener noticias por categoría
+app.get('/api/noticias/categoria/:categoria', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM noticias WHERE categoria = ? ORDER BY created_at DESC', [req.params.categoria]);
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    console.error('Error obteniendo noticias por categoría:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+// Crear noticia
+app.post('/api/noticias', async (req, res) => {
+  try {
+    const { titulo, resumen, contenido, urlImagen, categoria, esDestacada } = req.body;
+    if (!titulo || !resumen || !contenido || !categoria) {
+      return res.status(400).json({ success: false, message: 'Faltan campos obligatorios' });
+    }
+    const [result] = await pool.execute(
+      'INSERT INTO noticias (titulo, resumen, contenido, urlImagen, categoria, esDestacada) VALUES (?, ?, ?, ?, ?, ?)',
+      [titulo, resumen, contenido, urlImagen || null, categoria, !!esDestacada]
+    );
+    res.json({ success: true, message: 'Noticia creada', id: result.insertId });
+  } catch (error) {
+    console.error('Error creando noticia:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+// Actualizar noticia
+app.put('/api/noticias/:id', async (req, res) => {
+  try {
+    const { titulo, resumen, contenido, urlImagen, categoria, esDestacada } = req.body;
+    if (!titulo || !resumen || !contenido || !categoria) {
+      return res.status(400).json({ success: false, message: 'Faltan campos obligatorios' });
+    }
+    const [result] = await pool.execute(
+      'UPDATE noticias SET titulo=?, resumen=?, contenido=?, urlImagen=?, categoria=?, esDestacada=? WHERE id=?',
+      [titulo, resumen, contenido, urlImagen || null, categoria, !!esDestacada, req.params.id]
+    );
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Noticia no encontrada' });
+    }
+    res.json({ success: true, message: 'Noticia actualizada' });
+  } catch (error) {
+    console.error('Error actualizando noticia:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+// Eliminar noticia
+app.delete('/api/noticias/:id', async (req, res) => {
+  try {
+    const [result] = await pool.execute('DELETE FROM noticias WHERE id = ?', [req.params.id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Noticia no encontrada' });
+    }
+    res.json({ success: true, message: 'Noticia eliminada' });
+  } catch (error) {
+    console.error('Error eliminando noticia:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
 

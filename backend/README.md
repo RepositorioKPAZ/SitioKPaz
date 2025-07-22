@@ -47,6 +47,14 @@ El servidor se ejecutará en `http://localhost:3001`
 ### Salud
 - `GET /api/health` - Verificar estado del servidor
 
+### Noticias
+- `GET /api/noticias` - Obtener todas las noticias
+- `GET /api/noticias/:id` - Obtener una noticia por ID
+- `GET /api/noticias/categoria/:categoria` - Obtener noticias por categoría (alianza)
+- `POST /api/noticias` - Crear una noticia
+- `PUT /api/noticias/:id` - Actualizar una noticia
+- `DELETE /api/noticias/:id` - Eliminar una noticia
+
 ## 🗄️ Estructura de la Base de Datos
 
 ### Tabla: perfiles
@@ -73,6 +81,21 @@ CREATE TABLE `perfiles` (
   `costo_mes` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`id`)
 )
+```
+
+### Tabla: noticias
+```sql
+CREATE TABLE `noticias` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `titulo` varchar(255) NOT NULL,
+  `resumen` text NOT NULL,
+  `contenido` text NOT NULL,
+  `urlImagen` varchar(512) DEFAULT NULL,
+  `categoria` varchar(100) NOT NULL,
+  `esDestacada` boolean DEFAULT false,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+);
 ```
 
 ## 🔧 Configuración
