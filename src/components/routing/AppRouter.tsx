@@ -5,6 +5,8 @@ import { LoadingFallback } from "@/components/ui/loading-fallback";
 
 // Import Index directly for better performance on home page
 import Index from "@/pages/Index";
+import AdminDashboard from "@/components/admin/AdminDashboard";
+import NoticiaForm from "@/components/admin/NoticiaForm";
 
 // Group lazy imports by category for better organization and potential future code splitting
 const lazyImport = (importFn: () => Promise<any>) => 
@@ -102,6 +104,9 @@ export const AppRouter = memo(() => {
         
         {/* Catch-all route for 404 */}
         <Route path="*" element={<LazyRoute Component={NotFound} />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/crear" element={<NoticiaForm />} />
+        <Route path="/admin/editar/:id" element={<NoticiaForm />} />
       </Routes>
     </BrowserRouter>
   );

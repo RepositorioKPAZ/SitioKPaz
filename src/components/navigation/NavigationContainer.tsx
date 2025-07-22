@@ -20,7 +20,7 @@ export const NavigationContainer = ({
           <NavigationLogo />
         </div>
       
-        <div className="items-center gap-8">
+        <div className="flex items-center gap-8 h-16">
           <NavigationMenu>
                       <NavigationMenuItems handleInicioClick={handleInicioClick} />
 
